@@ -1605,11 +1605,14 @@ module Sinatra
         unbound_method          = generate_method(method_name, &block)
         pattern, keys           = compile path
         conditions, @conditions = @conditions, []
+        file, line              = block.source_location
 
         wrapper                 = block.arity != 0 ?
           proc { |a,p| unbound_method.bind(a).call(*p) } :
           proc { |a,p| unbound_method.bind(a).call }
         wrapper.instance_variable_set(:@route_name, method_name)
+        wrapper.instance_variable_set(:@route_file, file)
+        wrapper.instance_variable_set(:@route_line, line)
 
         [ pattern, keys, conditions, wrapper ]
       end
